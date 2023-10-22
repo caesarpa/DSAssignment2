@@ -4,14 +4,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+
 
 
 
@@ -45,6 +55,64 @@ public class SearchEngine {
 		if (properties.getCrawl()) {
 			crawler.crawl(startUrl);
 			indexFlipper.flipIndex(indexFileName, flippedIndexFileName);
+		}
+	}
+	@GetMapping("/search")
+	public String search(@RequestParam("q") String query) throws IOException {
+		List<String> urls = searcher.search(query, flippedIndexFileName);
+		if (urls.size() == 0){
+			return "No results found";
+		}
+		String html = "<html>\n" +
+				"    <head>\n" +
+				"        <title>Poogle results</title>\n" +
+				"        <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n" +
+				"        <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n" +
+				"        <link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap\" rel=\"stylesheet\">\n" +
+				"        <style>\n" +
+				"            a{\n" +
+				"                color: rgb(1, 68, 105);\n" +
+				"                font-family: 'Roboto', sans-serif;\n" +
+				"            }\n" +
+				"            h1{\n" +
+				"                margin-top: 50px;\n" +
+				"                margin-left: 20px;\n" +
+				"                margin-bottom: 50px;\n" +
+				"                color:  rgb(80, 174, 214);\n" +
+				"                font-family: 'Roboto', sans-serif;\n" +
+				"            }\n" +
+				"        </style>\n" +
+				"    </head>\n" +
+				"    <body>\n" +
+				"        <h1>Results:</h1>";
+		for (String url : urls){
+			html += "<a href=\"" + url + "\">"+ "&#9679; " + url + "</a><br><br>";
+		}
+		html += "</body></html>";
+		return html;
+	}
+	@GetMapping("/lucky")
+	public ModelAndView lucky(@RequestParam("q") String query){
+		String url = "http://localhost/";
+		List<String> urls = searcher.search(query, flippedIndexFileName);
+		if (urls.size() > 0){
+			url = urls.get(0);
+		} else {
+			RedirectView baseRedirect = new RedirectView("http://localhost/") ;
+			return new ModelAndView(baseRedirect);
+		}
+		RedirectView redirectView = new RedirectView(url);
+		return new ModelAndView(redirectView);
+	}
+	@GetMapping("/")
+	public String home() throws IOException {
+		Resource resource = new ClassPathResource("static/index.html");
+
+		if (resource.exists()) {
+			byte[] fileContent = Files.readAllBytes(resource.getFile().toPath());
+			return new String(fileContent);
+		} else {
+			return "HTML file not found.";
 		}
 	}
 

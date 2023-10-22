@@ -1,11 +1,96 @@
 <!DOCTYPE html>
 <html>
-<head><title>Hypermedia Environment</title></head>
+<head>
+    <title>Poogle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <style>
+        
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 20px;
+            font-family: 'Roboto', sans-serif;
+            border-radius: 4px;
+            border: 0px;
+            color: #ffffff;
+            background-color: rgb(80, 174, 214);
+            
+        }
+        button:hover {
+            background-color: rgb(0, 119, 182);
+        }
+        .input-bar {
+            height: 35px;
+            font-size: 20px;
+            margin-right: 5px;
+            font-family: 'Roboto', sans-serif;
+            border-color: rgb(80, 174, 214);
+            border-style: solid;
+            color: rgb(0, 119, 182);
+            padding-top: 2px;
+            padding-bottom: 2px;
+            padding-left: 10px;
+            padding-right: 10px;
+        
+        }
+        .input-bar:focus {
+            outline: 0px;
+            border-color:rgb(0, 119, 182);
+        }
+        .lucky-input {
+        }
+        .form {
+        display: inline-block;
+        }
+        .center {
+            top: 60%;
+            left: 50%;
+            position: fixed;
+            margin-top: -27px;
+            margin-left: -304px;
+        }
+        .pog{
+            top: 35%;
+            left: 50%;
+            position: fixed;
+            margin-top: -100px;
+            margin-left: -190px;
+            font-size: 100px;
+            font-family: 'Roboto', sans-serif;
+            color: rgb(80, 174, 214);
+        }
+        
+    </style>
+</head>
 <body>
-<form id = "form_id" action = "/search" method = "get">
-    <!--add input for keyword-->
-    <!--add button for "Search"-->
-    <!--add button for "I'm feeling lucky"-->
+    <div class="center">
+<form class="form"id="form_id" action="/search" method="get">
+    <input class="input-bar" type="text" name="q">
+    <button id="sub" type="submit">
+        Search
+    </button>
 </form>
+
+<form class="form"id="lucky_form" action="/lucky" method="get">
+    <button id="luck" type="submit" onclick="prepareLucky()">
+        I'm feeling lucky!
+    </button>
+    <input class= "lucky-input" type="hidden" id="lucky_input" name="q" value="">
+</form>
+
+<script>
+    function prepareLucky() {
+        var searchInput = document.querySelector('.input-bar').value;
+        document.getElementById('lucky_input').value = searchInput;
+    }
+</script>
+</div>
+<div class="pog">
+    <p>
+        POOGLE
+    </p>
+</div>
 </body>
 </html>

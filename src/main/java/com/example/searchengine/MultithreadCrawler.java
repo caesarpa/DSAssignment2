@@ -63,7 +63,8 @@ public class MultithreadCrawler extends Crawler {
 
         double endTime = System.currentTimeMillis();
         double duration = endTime - startTime;
-        System.out.println("duration: " + duration);
+        duration = duration / 1000;
+        System.out.println("duration: " + duration + " seconds");
         int x = 0;
     }
 

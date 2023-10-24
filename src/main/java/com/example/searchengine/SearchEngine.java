@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +21,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -91,18 +95,20 @@ public class SearchEngine {
 		html += "</body></html>";
 		return html;
 	}
-	@GetMapping("/lucky")
-	public ModelAndView lucky(@RequestParam("q") String query){
-		String url = "http://localhost/";
-		List<String> urls = searcher.search(query, flippedIndexFileName);
+
+	public static String getUrl(List<String> urls) {
 		if (urls.size() > 0){
-			url = urls.get(0);
+			return urls.get(0);
 		} else {
-			RedirectView baseRedirect = new RedirectView("http://localhost/") ;
-			return new ModelAndView(baseRedirect);
+			return "http://localhost/";
 		}
-		RedirectView redirectView = new RedirectView(url);
-		return new ModelAndView(redirectView);
+	}
+	@GetMapping("/lucky")
+	public ResponseEntity<String> lucky(@RequestParam("q") String query){
+		List<String> urls = searcher.search(query, flippedIndexFileName);
+		HttpHeaders headerMap = new HttpHeaders();
+		headerMap.put("Location", Collections.singletonList(getUrl(urls)));
+		return new ResponseEntity<>(headerMap, org.springframework.http.HttpStatus.FOUND);
 	}
 	@GetMapping("/")
 	public String home() throws IOException {
